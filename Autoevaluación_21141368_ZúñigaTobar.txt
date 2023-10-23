@@ -1,0 +1,37 @@
+AUTOEVALUACIÓN
+Laboratorio 2 Paradigmas de programación
+Elías Zúñiga Tobar 21.141.368-9
+Profesor Gonzalo Martinez
+
+Requerimientos No Funcionales:		Puntaje:
+
+Autoevaluación				
+Lenguaje				1
+Verisón					1
+Standard				1
+No variables				
+Documentación				
+Dom->Rec				 
+Organización				
+Historial				
+Script de pruebas			
+Prerrequisitos				
+
+
+Requerimientos Funcionales:		Puntaje:
+
+TDA's					
+option					
+flow					
+flow-add-option				
+chatbot					
+chatbot-add-flow			
+system					
+system-add-chatbot			
+system-add-user				
+system-login				
+system-logout				
+system-talk-rec				
+system-talk-norec			
+system-synthesis			
+system-simulate				

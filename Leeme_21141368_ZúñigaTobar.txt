@@ -1,0 +1,7 @@
+ARCHIVO LEEME.TXT
+Laboratorio 2 Paradigmas de programación
+Elías Zúñiga Tobar 21.141.368-9
+Profesor Gonzalo Martinez
+
+-El código se encuentra en la carpeta "Código fuente"
+
