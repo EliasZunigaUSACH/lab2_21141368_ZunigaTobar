@@ -4,6 +4,9 @@
 % Profesor Gonzalo Matrinez
 % TDA FLOW
 
+:- use_module(tda_option_21141368_ZunigaTobar).
+
+/*
 pertenece(Elemento, [Elemento, _]).
 
 pertenece(Elemento, [_|Resto]):-
@@ -11,21 +14,20 @@ pertenece(Elemento, [_|Resto]):-
 
 noPertenece(Elemento, Lista):-
     \+ pertenece(Elemento, Lista).
+*/
+agregarFlowSinDuplicados([], FlowsAcc, FlowsAcc):- !.
 
-agregarFlowSinDuplicados([], ListaAcc, ListaAcc):- !.
+agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+    noPertenece(FlowAgregar, FlowsAcc),
+    agregarFlowSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
 
-agregarFlowSinDuplicados([ElementoParaAgregar|RestoParaAgregar], Acc, ListaSalida):-
-    noPertenece(ElementoParaAgregar, Acc),
-    agregarFlowSinDuplicados(RestoParaAgregar, [ElementoParaAgregar|Acc], ListaSalida).
-
-agregarFlowSinDuplicados([ElementoParaAgregar|RestoParaAgregar], Acc, ListaSalida):-
-    pertenece(ElementoParaAgregar, Acc),
-    agregarFlowSinDuplicados(RestoParaAgregar, [ElementoParaAgregar|Acc], ListaSalida).
-
-
-agregarFlow(NewOption, Options, NewOptions).
+agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+    pertenece(FlowAgregar, FlowsAcc),
+    agregarFlowSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
 
 flow(Id, NameMessage, Options, [Id, NameMessage, Options]).
+
+agregarFlow(NewOption, Options, NewOptions).
 
 flowAddOption(Flow, NewOption, NewFlow):-
     flow(Id, NameMessage, Options, Flow),

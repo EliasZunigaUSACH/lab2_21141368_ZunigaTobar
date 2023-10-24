@@ -1,11 +1,19 @@
-/*
-PARADIGMAS DE PROGRAMACIÓN LABORATORIO 2
-Nombre: Elías Zúñiga Tobar
-RUT: 21.141.368-9
-Profesor Gonzalo Matrinez
-TDA OPTION
-*/
+% PARADIGMAS DE PROGRAMACIÓN LABORATORIO 2
+% Nombre: Elías Zúñiga Tobar
+% RUT: 21.141.368-9
+% Profesor Gonzalo Matrinez
+% TDA OPTION
 
-makeOption(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
+:- module(tda_option_21141368_ZunigaTobar, [pertenece/2, noPertenece/2]).
+
+pertenece(Elemento, [Elemento, _]).
+
+pertenece(Elemento, [_|Resto]):-
+    pertenece(Elemento, Resto).
+
+noPertenece(Elemento, Lista):-
+    \+ pertenece(Elemento, Lista).
+
+agregarOptionsSinDuplicados().
 
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
