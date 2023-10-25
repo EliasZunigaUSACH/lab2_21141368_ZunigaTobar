@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA OPTION
 
-:- module(tda_option_21141368_ZunigaTobar, [pertenece/2, noPertenece/2]).
+:- module(tda_option_21141368_ZunigaTobar, [pertenece/2, noPertenece/2, getOptionId/2, getOptionsIds/3, option/6]).
 
 pertenece(Elemento, [Elemento, _]).
 
@@ -14,14 +14,12 @@ pertenece(Elemento, [_|Resto]):-
 noPertenece(Elemento, Lista):-
     \+ pertenece(Elemento, Lista).
 
-agregarOptionsSinDuplicados([], ListaAcc, ListaAcc):- !.
+getOptionId(Option, Id):-
+    option(Id, _, _, _, _, Option).
 
-agregarOptionsSinDuplicados([OpcionAgregar|RestoOpciones], Acc, ListaSalida):-
-    noPertenece(OpcionAgregar, Acc),
-    agregarOptionsSinDuplicados(RestoOpciones, [OpcionAgregar|Acc], ListaSalida).
-
-agregarOptionsSinDuplicados([OpcionAgregar|RestoOpciones], Acc, ListaSalida):-
-    pertenece(OpcionAgregar, Acc),
-    agregarOptionsSinDuplicados(RestoOpciones, [OpcionAgregar|Acc], ListaSalida).
+getOptionsIds([], IdsAcc, IdsAcc):- !.
+getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
+    getOptionId(OptionHead, Id),
+    getOptionsIds(OptionsTail, [Id|IdsAcc], IdsSalida).
 
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).

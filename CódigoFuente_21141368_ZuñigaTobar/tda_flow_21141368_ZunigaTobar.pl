@@ -31,18 +31,34 @@ agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
 agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     pertenece(FlowAgregar, FlowsAcc),
     agregarFlowSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc],
-    FlowsSalida).N
+    FlowsSalida).
 */
-agregarFlowSinDuplicados([], FlowsAcc, FlowsAcc):- !.
-agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
-    getFlowsIds([FlowAgregar|RestoFlows], Ids),
-    noPertenece([]).
+verificarDuplicidadOption(OptionHead, OptionsTail):-
+    getOptionId(OptionHead, Id),
+    getOptionsIds(OptionsTail, [], Ids),
+    noPertenece(Id, Ids).
+
+agregarOptionsSinDuplicados([], OptionsAcc, OptionsAcc).
+agregarOptionsSinDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
+    verificarDuplicidadOption(OptionAgregar, OptionsAcc),
+    agregarOptionsSinDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
+/*
+verificarDuplicidadOption(OptionHead, OptionsTail):-
+    getOptionId(OptionHead, Id),
+    getOptionsIds(OptionsTail, [], Ids),
+    pertenece(Id, Ids).
+
+agregarOptionsSinDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
+    verificarDuplicidadOption(OptionAgregar, OptionsAcc),
+    agregarOptionsSinDuplicados(RestoOptions, OptionsAcc, OptionsSalida).
+*/
+agregarFlow(NewOption, Options, [NewOption|Options]).
 
 flowAddOption(Flow, NewOption, NewFlow):-
     flow(Id, NameMessage, Options, Flow),
     agregarFlow(NewOption, Options, NewOptions),
     flow(Id, NameMessage, NewOptions, NewFlow).
 
-flow(Id, NameMessage, Options, [Id, NameMessage, Options]).
+flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
+    agregarOptionsSinDuplicados(Options, [], OptionsFiltrados).
 
-agregarFlow(NewOption, Options, NewOptions).

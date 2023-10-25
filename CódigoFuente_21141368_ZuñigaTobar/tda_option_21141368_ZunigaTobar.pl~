@@ -14,6 +14,14 @@ pertenece(Elemento, [_|Resto]):-
 noPertenece(Elemento, Lista):-
     \+ pertenece(Elemento, Lista).
 
-agregarOptionsSinDuplicados().
+agregarOptionsSinDuplicados([], ListaAcc, ListaAcc):- !.
+
+agregarOptionsSinDuplicados([OpcionAgregar|RestoOpciones], Acc, ListaSalida):-
+    noPertenece(OpcionAgregar, Acc),
+    agregarOptionsSinDuplicados(RestoOpciones, [OpcionAgregar|Acc], ListaSalida).
+
+agregarOptionsSinDuplicados([OpcionAgregar|RestoOpciones], Acc, ListaSalida):-
+    pertenece(OpcionAgregar, Acc),
+    agregarOptionsSinDuplicados(RestoOpciones, [OpcionAgregar|Acc], ListaSalida).
 
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
