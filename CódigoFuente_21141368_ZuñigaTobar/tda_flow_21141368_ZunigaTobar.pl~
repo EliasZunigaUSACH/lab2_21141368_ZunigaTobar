@@ -5,51 +5,46 @@
 % TDA FLOW
 
 :- use_module(tda_option_21141368_ZunigaTobar).
-
-/*
-pertenece(Elemento, [Elemento, _]).
-
-pertenece(Elemento, [_|Resto]):-
-    pertenece(Elemento, Resto).
-
-noPertenece(Elemento, Lista):-
-    \+ pertenece(Elemento, Lista).
-*/
+:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptionsSinDuplicados/3, agregarFlow/3, flow/4, flowAddOption/3]).
 
 getFlowId(Flow, Id):-
     flow(Id, _, _, Flow).
 
 getFlowsIds([], IdsAcc, IdsAcc):- !.
+
 getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
     getFlowId(FlowCabeza, Id),
     getFlowsIds(FlowsCola, [Id|IdsAcc], IdsSalida).
+
 /*
-agregarFlowSinDuplicados([], FlowsAcc, FlowsAcc):- !.
-agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
-    noPertenece(FlowAgregar, FlowsAcc),
-    agregarFlowSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
-agregarFlowSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
-    pertenece(FlowAgregar, FlowsAcc),
-    agregarFlowSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc],
-    FlowsSalida).
-*/
 verificarDuplicidadOption(OptionHead, OptionsTail):-
     getOptionId(OptionHead, Id),
     getOptionsIds(OptionsTail, [], Ids),
     noPertenece(Id, Ids).
+*/
 
-agregarOptionsSinDuplicados([], OptionsAcc, OptionsAcc).
+agregarOptionsSinDuplicados([], OptionsAcc, OptionsAcc):- !.
+
 agregarOptionsSinDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
-    verificarDuplicidadOption(OptionAgregar, OptionsAcc),
+    getOptionId(OptionAgregar, Id),
+    getOptionsIds(OptionsAcc, [], Ids),
+    noPertenece(Id, Ids),
     agregarOptionsSinDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
 
+agregarOptionsSinDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
+    getOptionId(OptionAgregar, Id),
+    getOptionsIds(OptionsAcc, [], Ids),
+    pertenece(Id, Ids),
+    agregarOptionsSinDuplicados(RestoOptions, OptionsAcc, OptionsSalida).
+
 agregarFlow(NewOption, Options, [NewOption|Options]).
+
+flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
+    agregarOptionsSinDuplicados(Options, [], OptionsFiltrados).
 
 flowAddOption(Flow, NewOption, NewFlow):-
     flow(Id, NameMessage, Options, Flow),
     agregarFlow(NewOption, Options, NewOptions),
     flow(Id, NameMessage, NewOptions, NewFlow).
 
-flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
-    agregarOptionsSinDuplicados(Options, [], OptionsFiltrados).
 
