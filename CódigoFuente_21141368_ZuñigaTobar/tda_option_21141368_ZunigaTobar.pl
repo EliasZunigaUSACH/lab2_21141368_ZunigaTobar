@@ -6,7 +6,7 @@
 
 :- module(tda_option_21141368_ZunigaTobar, [pertenece/2, noPertenece/2, getOptionId/2, getOptionsIds/3, option/6]).
 
-pertenece(Elemento, [Elemento, _]).
+pertenece(Elemento, [Elemento|_]).
 
 pertenece(Elemento, [_|Resto]):-
     pertenece(Elemento, Resto).

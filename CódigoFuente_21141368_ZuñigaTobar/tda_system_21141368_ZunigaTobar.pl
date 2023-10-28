@@ -4,8 +4,6 @@
 % Profesor Gonzalo Matrinez
 % TDA SYSTEM
 
-
-:- use_module(tda_flow_21141368_ZunigaTobar).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
 :- use_module(tda_user_21141368_ZunigaTobar).
 
@@ -22,8 +20,14 @@ makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, 
 system(Name, InitialChatbotCodeLink, Chatbots, System):-
     makeSystem(Name, [], [], InitialChatbotCodeLink, Chatbots, System).
 
+getSystemName(System, Name):-
+    makeSystem(Name, _, _, _, _, System).
+
 getSystemMembers(System, Members):-
     makeSystem(_, _, Members, _, _, System).
+
+getSystemChatbots(System, Chatbots):-
+    makeSystem(_, _, _, _, Chatbots, System).
 
 getMembersIds([], Ids, Ids).
 getMembersIds([User|Members], Ids, IdsOut):-
@@ -37,7 +41,7 @@ systemAddUser(System, User, NewSystem):-
     user(User, UserMin),
     getUserId(UserMin, Id),
     getMembersIds(Members, [], Ids),
-    nopertenece(Id, Ids),
+    noPertenece(Id, Ids),
     registerUser(UserMin, Members, UpdatedMembers),
     makeSystem(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemAddUser(System, User, NewSystem):-
@@ -48,26 +52,33 @@ systemAddUser(System, User, NewSystem):-
     pertenece(Id, Ids),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
-
-systemLogedUser(System, ConectedUser):-
-    makeSystem(_, _, Members, ConectedUser, _, _, System),
-    pertenece(ConectedUser, Members).
+isLogedUser(System, ConectedUser):-
+    makeSystem(_, _, _, ConectedUser, _, _, System),
+    \+ length(ConectedUser, 0).
 
 systemLogin(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ systemLogedUser(System, ConectedUser),
+    \+ isLogedUser(System, ConectedUser),
+    pertenece(User, Members),
     makeSystem(Name, Date, Members, User, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemLogin(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    systemLogedUser(System, ConectedUser),
+    isLogedUser(System, ConectedUser),
+    pertenece(User, Members),
+    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+systemLogin(System, User, NewSystem):-
+    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    \+ isLogedUser(System, ConectedUser),
+    \+ pertenece(User, Members),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
 systemLogout(System, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    systemLogedUser(System, ConectedUser),
+    isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
 systemLogout(System, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ systemLogedUser(System, ConectedUser),
+    \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+
 

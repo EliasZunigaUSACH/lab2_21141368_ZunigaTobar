@@ -4,8 +4,8 @@
 % Profesor Gonzalo Matrinez
 % TDA FLOW
 
+:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptionsSinDuplicados/3, agregarOption/3, flow/4, flowAddOption/3]).
 :- use_module(tda_option_21141368_ZunigaTobar).
-:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptionsSinDuplicados/3, agregarOption/3, flow/4, flowAddOption/3, agregarOption/3]).
 
 getFlowId(Flow, Id):-
     flow(Id, _, _, Flow).

@@ -13,7 +13,6 @@ sacarNumeroDeNombre([], Id, Id):- !.
 sacarNumeroDeNombre([Head|Resto], Id, IdOut):-
     \+ number(Head),
     sacarNumeroDeNombre(Resto, Id, IdOut).
-
 sacarNumeroDeNombre([Head|Resto], Id, IdOut):-
     number(Head),
     sacarNumeroDeNombre(Resto, [Head|Id], IdOut).
