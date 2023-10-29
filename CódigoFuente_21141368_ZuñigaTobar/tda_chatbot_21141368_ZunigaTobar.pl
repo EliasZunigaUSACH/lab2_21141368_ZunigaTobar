@@ -5,7 +5,7 @@
 % TDA CHATBOT
 
 :- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlowsSinDuplicados/3, chatbot/6, chatbotAddFlow/3, agregarFlow/3]).
-% :- use_module(tda_option_21141368_ZunigaTobar).
+:- use_module(tda_option_21141368_ZunigaTobar).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
 getChatbotId(Chatbot, Id):-

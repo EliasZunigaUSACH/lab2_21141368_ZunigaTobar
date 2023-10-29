@@ -9,7 +9,7 @@ Autoevaluación
 Lenguaje				1
 Verisón					1
 Standard				1
-No variables				
+No variables				1
 Documentación				
 Dom->Rec				 
 Organización				
@@ -20,8 +20,8 @@ Prerrequisitos
 
 Requerimientos Funcionales:		Puntaje:
 
-TDA's					
-option					
+TDA's					1
+option					1
 flow					
 flow-add-option				
 chatbot					
