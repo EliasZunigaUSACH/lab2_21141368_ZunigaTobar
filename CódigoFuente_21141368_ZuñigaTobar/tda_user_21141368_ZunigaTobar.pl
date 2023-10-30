@@ -4,9 +4,9 @@
 % Profesor Gonzalo Matrinez
 % TDA USER
 
-:- module(tda_user_21141368_ZunigaTobar, [user/2, sacarNumeroDeNombre/3, getUserId/2]).
+:- module(tda_user_21141368_ZunigaTobar, [user/3, sacarNumeroDeNombre/3, getUserId/2]).
 
-user(Nombre, NombreMin):-
+user(Nombre, History, [NombreMin|History]):-
     string_lower(Nombre, NombreMin).
 
 sacarNumeroDeNombre([], Id, Id):- !.
@@ -18,7 +18,7 @@ sacarNumeroDeNombre([Head|Resto], Id, IdOut):-
     sacarNumeroDeNombre(Resto, [Head|Id], IdOut).
 
 getUserId(User, Id):-
-    user(_, User),
+    user(_, User, _, _),
     atom_chars(User, UserList),
     sacarNumeroDeNombre(UserList, [], Id).
 

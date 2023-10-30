@@ -9,6 +9,7 @@
 :- use_module(tda_flow_21141368_ZunigaTobar).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
 :- use_module(tda_user_21141368_ZunigaTobar).
+:- use_module(tda_chatHistory_21141368_ZunigaTobar).
 
 putDateTime(DateTime):-
     get_time(Time),
@@ -57,11 +58,12 @@ getMembersIds([User|Members], Ids, IdsOut):-
     getUserId(User, Id),
     getMembersIds(Members, [Id|Ids], IdsOut).
 
-registerUser(User, Members, [User|Members]).
+registerUser(UserName, Members, [User|Members]):-
+    user(UserName, [], User).
 
 systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    user(User, UserMin),
+    user(User, _, [UserMin|_]),
     getUserId(UserMin, Id),
     getMembersIds(Members, [], Ids),
     noPertenece(Id, Ids),
@@ -69,7 +71,7 @@ systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    user(User, UserMin),
+    user(User, [], [UserMin|_]),
     getUserId(UserMin, Id),
     getMembersIds(Members, [], Ids),
     pertenece(Id, Ids),
@@ -104,16 +106,14 @@ systemLogout(System, NewSystem):-
     \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
-
-recMessage(User, Message):-
-    user().
-
 systemTalkRec(System, Message, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    .
+    user(UserName, History, ConectedUser),
+    recMessage(Message, History, UpdatedHistory),
+    user(UserName, UpdatedHistory, UpdatedConectedUser),
+    makeSystem(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemTalkRec(System, _, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
-
