@@ -31,13 +31,13 @@ agregarChatbotSinDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, Chatbot
 makeSystem(Name, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]):-
     putDateTime(Date).
 
-makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, ChatbotsFiltrados]):-
-    agregarChatbotSinDuplicados(Chatbots, [], ChatbotsFiltrados).
+makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
 
 agregarChatbot(NewChatbot, Chatbots, [NewChatbot|Chatbots]).
 
 system(Name, InitialChatbotCodeLink, Chatbots, System):-
-    makeSystem(Name, [], [], InitialChatbotCodeLink, Chatbots, System).
+    agregarChatbotSinDuplicados(Chatbots, [], ChatbotsFiltrados),
+    makeSystem(Name, [], [], InitialChatbotCodeLink, ChatbotsFiltrados, System).
 
 systemAddChatbot(System, NewChatbot, NewSystem):-
     makeSystem(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
@@ -63,7 +63,7 @@ registerUser(UserName, Members, [User|Members]):-
 
 systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    user(User, _, [UserMin|_]),
+    string_lower(User, UserMin),
     getUserId(UserMin, Id),
     getMembersIds(Members, [], Ids),
     noPertenece(Id, Ids),
@@ -71,7 +71,7 @@ systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemAddUser(System, User, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    user(User, [], [UserMin|_]),
+    string_lower(User, UserMin),
     getUserId(UserMin, Id),
     getMembersIds(Members, [], Ids),
     pertenece(Id, Ids),

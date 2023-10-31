@@ -4,11 +4,13 @@
 % Profesor Gonzalo Matrinez
 % TDA FLOW
 
-:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptionsSinDuplicados/3, agregarOption/3, flow/4, flowAddOption/3]).
+:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptionsSinDuplicados/3, agregarOption/3, flow/4, flowAddOption/3, makeFlow/4]).
 :- use_module(tda_option_21141368_ZunigaTobar).
 
+makeFlow(Id, NameMessage, OptionsFiltrados, [Id, NameMessage, OptionsFiltrados]).
+
 getFlowId(Flow, Id):-
-    flow(Id, _, _, Flow).
+    makeFlow(Id, _, _, Flow).
 
 getFlowsIds([], IdsAcc, IdsAcc):- !.
 getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
@@ -29,12 +31,11 @@ agregarOptionsSinDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSal
 
 agregarOption(NewOption, Options, [NewOption|Options]).
 
-flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
-    agregarOptionsSinDuplicados(Options, [], OptionsFiltrados).
+flow(Id, NameMessage, Options, Flow):-
+    agregarOptionsSinDuplicados(Options, [], OptionsFiltrados),
+    makeFlow(Id, NameMessage, OptionsFiltrados, Flow).
 
 flowAddOption(Flow, NewOption, NewFlow):-
-    flow(Id, NameMessage, Options, Flow),
+    makeFlow(Id, Message, Options, Flow),
     agregarOption(NewOption, Options, NewOptions),
-    flow(Id, NameMessage, NewOptions, NewFlow).
-
-
+    flow(Id, Message, NewOptions, NewFlow).

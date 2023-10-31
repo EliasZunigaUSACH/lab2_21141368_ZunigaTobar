@@ -31,13 +31,13 @@ agregarChatbotSinDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, Chatbot
 makeSystem(Name, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]):-
     putDateTime(Date).
 
-makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, ChatbotsFiltrados]):-
-    agregarChatbotSinDuplicados(Chatbots, [], ChatbotsFiltrados).
+makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
 
 agregarChatbot(NewChatbot, Chatbots, [NewChatbot|Chatbots]).
 
 system(Name, InitialChatbotCodeLink, Chatbots, System):-
-    makeSystem(Name, [], [], InitialChatbotCodeLink, Chatbots, System).
+    agregarChatbotSinDuplicados(Chatbots, [], ChatbotsFiltrados),
+    makeSystem(Name, [], [], InitialChatbotCodeLink, ChatbotsFiltrados, System).
 
 systemAddChatbot(System, NewChatbot, NewSystem):-
     makeSystem(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
@@ -117,12 +117,3 @@ systemTalkRec(System, _, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
-
-myRandom(Xn, Xn1):-
-    mulTemp is 1103515245 * Xn,
-    sumTemp is mulTemp * 12345,
-    Xn1 is sumTemp mod 2147483648.
-
-systemSimulate(System, 0, Seed, NewSystem):- !.
-systemSimulate(System, 0, Seed, NewSystem):-
-

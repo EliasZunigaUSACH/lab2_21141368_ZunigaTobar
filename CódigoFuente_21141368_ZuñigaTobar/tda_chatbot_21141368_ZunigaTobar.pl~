@@ -4,7 +4,8 @@
 % Profesor Gonzalo Matrinez
 % TDA CHATBOT
 
-:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlowsSinDuplicados/3, chatbot/6, chatbotAddFlow/3, agregarFlow/3]).
+:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlowsSinDuplicados/3, chatbot/6, chatbotAddFlow/3, agregarFlow/3, makeChatbot/6]).
+:- use_module(tda_option_21141368_ZunigaTobar).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
 getChatbotId(Chatbot, Id):-
@@ -28,10 +29,13 @@ agregarFlowsSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
 
 agregarFlow(NewFlow, Flows, [NewFlow|Flows]).
 
-chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados]):-
-    agregarFlowsSinDuplicados(Flows, [], FlowsFiltrados).
+makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, StartFlowID, Flows]).
+
+chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot):-
+    agregarFlowsSinDuplicados(Flows, [], FlowsFiltrados),
+    makeChatbot(Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados, Chatbot).
 
 chatbotAddFlow(Chatbot, NewFlow, NewChatbot):-
-    chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot),
-    agregarFlow(NewFlow, Flows, UpdatedFlows),
-    chatbot(Id, Name, WelcomeMsg, StartFlowID, UpdatedFlows, NewChatbot).
+    makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot),
+    agregarFlow(NewFlow, Flows, NewFlows),
+    chatbot(Id, Name, WelcomeMsg, StartFlowID, NewFlows, NewChatbot).
