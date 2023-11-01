@@ -13,6 +13,7 @@ makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, Sta
 getChatbotId(Chatbot, Id):-
     makeChatbot(Id, _, _, _, _, Chatbot).
 
+getChatbotsIds([], IdsAcc, IdsAcc):- !.
 getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
     getChatbotId(ChatbotHead, Id),
     getChatbotsIds(RestoChatbots, [Id|IdsAcc], IdsSalida).

@@ -8,8 +8,10 @@
 :- use_module(tda_option_21141368_ZunigaTobar).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
+makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, StartFlowID, Flows]).
+
 getChatbotId(Chatbot, Id):-
-    chatbot(Id, _, _, _, _, Chatbot).
+    makeChatbot(Id, _, _, _, _, Chatbot).
 
 getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
     getChatbotId(ChatbotHead, Id),
@@ -28,8 +30,6 @@ agregarFlowsSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     agregarFlowsSinDuplicados(RestoFlows, FlowsAcc, FlowsSalida).
 
 agregarFlow(NewFlow, Flows, [NewFlow|Flows]).
-
-makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, StartFlowID, Flows]).
 
 chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot):-
     agregarFlowsSinDuplicados(Flows, [], FlowsFiltrados),

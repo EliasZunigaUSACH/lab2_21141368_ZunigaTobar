@@ -4,11 +4,12 @@
 % Profesor Gonzalo Matrinez
 % SCRIPT DE PRUEBAS
 
-:- use_module(tda_system_21141368_ZunigaTobar).
-:- use_module(tda_option_21141368_ZunigaTobar).
-:- use_module(tda_flow_21141368_ZunigaTobar).
-:- use_module(tda_chatbot_21141368_ZunigaTobar).
-:- use_module(tda_user_21141368_ZunigaTobar).
+%:- use_module(tda_system_21141368_ZunigaTobar).
+%:- use_module(tda_option_21141368_ZunigaTobar).
+%:- use_module(tda_flow_21141368_ZunigaTobar).
+%:- use_module(tda_chatbot_21141368_ZunigaTobar).
+%:- use_module(tda_user_21141368_ZunigaTobar).
+:- consult('tda_system_21141368_ZunigaTobar.pl').
 
 option(1, "1 - viajar", 2, 4, ["viajar", "turistear", "conocer"], O1).
 option(2, "2 - estudiar", 4, 3, ["aprender", "perfeccionarme"], O2).
