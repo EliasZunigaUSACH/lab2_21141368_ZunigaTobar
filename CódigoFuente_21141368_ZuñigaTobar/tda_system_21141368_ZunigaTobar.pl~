@@ -48,7 +48,7 @@ systemAddChatbot(System, NewChatbot, NewSystem):-
     agregarChatbotSinDuplicados(UpgradedChatbots, [], ChatbotsFiltrados),
     makeSystem(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsFiltrados, NewSystem).
 
-getMembersIds([], Ids, Ids).
+getMembersIds([], Ids, Ids):- !.
 getMembersIds([User|Members], Ids, IdsOut):-
     getUserId(User, Id),
     getMembersIds(Members, [Id|Ids], IdsOut).
