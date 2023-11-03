@@ -7,6 +7,8 @@
 :- module(tda_chatHistory_21141368_ZunigaTobar, [recMessage/3]).
 :- use_module(tda_user_21141368_ZunigaTobar).
 
-recMessage(NewMessage, History, [History|NewMessage]).
+%recMessage(NewMessage, History, [History|NewMessage]).
 
+recMessage(NewMessage, History, UpdatedHistory):-
+    append(History, [NewMessage], UpdatedHistory).
 

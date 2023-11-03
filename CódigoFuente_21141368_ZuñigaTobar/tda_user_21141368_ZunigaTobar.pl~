@@ -11,15 +11,6 @@ makeUser(Name, History, [Name|History]).
 user(Nombre, History, User):-
     string_lower(Nombre, NombreMin),
     makeUser(NombreMin, History, User).
-/*
-sacarNumeroDeNombre([], Id, Id):- !.
-sacarNumeroDeNombre([Head|Resto], Id, IdOut):-
-    \+ number(Head),
-    sacarNumeroDeNombre(Resto, Id, IdOut).
-sacarNumeroDeNombre([Head|Resto], Id, IdOut):-
-    number(Head),
-    sacarNumeroDeNombre(Resto, [Head|Id], IdOut).
-*/
 
 sacarNumeroDeNombre([Head|Resto], Id):-
     \+ atom_number(Head, Id),
