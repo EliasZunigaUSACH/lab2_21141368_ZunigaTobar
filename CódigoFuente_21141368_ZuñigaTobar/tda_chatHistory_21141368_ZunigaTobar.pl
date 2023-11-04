@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA CHATHISTORY
 
-:- module(tda_chatHistory_21141368_ZunigaTobar, [recMessage/3]).
+:- module(tda_chatHistory_21141368_ZunigaTobar, [recMessage/3, isHistoryNull/1, isHistoryNotNull/1]).
 :- use_module(tda_user_21141368_ZunigaTobar).
 
 %recMessage(NewMessage, History, [History|NewMessage]).
@@ -12,3 +12,8 @@
 recMessage(NewMessage, History, UpdatedHistory):-
     append(History, [NewMessage], UpdatedHistory).
 
+isHistoryNull(History):-
+    length(History, 0).
+
+isHistoryNotNull(History):-
+    \+ length(History, 0).

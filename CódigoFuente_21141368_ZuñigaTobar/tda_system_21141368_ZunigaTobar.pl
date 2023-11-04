@@ -4,12 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA SYSTEM
 
-% :- module(tda_system_21141368_ZunigaTobar, [putDateTime/1,
-% agregarChatbotSinDuplicados/3, makeSystem/6, makeSystem/7,
-% agregarChatbot/3, system/4, systemAddChatbot/3, getSystemName/2,
-% getSystemMembers/2, getSystemChatbots/2, getMembersIds/3,
-% registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3,
-% systemLogout/2]).
+:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, agregarChatbotSinDuplicados/3, makeSystem/7, makeSystem/7, agregarChatbot/3, system/4, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
 :- use_module(tda_option_21141368_ZunigaTobar).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
@@ -18,8 +13,8 @@
 
 putDateTime(DateTime):-
     get_time(Time),
-    stamp_date_time(Time, Date, local),
-    format_time(atom(DateTime), "%T %d-%M-%Y", Date).
+    stamp_date_time(Time, Date, 'UTC'),
+    format_time(atom(DateTime), "%T %d-%m-%y", Date).
 
 agregarChatbotSinDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
 agregarChatbotSinDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
@@ -113,7 +108,7 @@ systemLogout(System, NewSystem):-
 systemTalkRec(System, Message, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    user(UserName, History, ConectedUser),
+    makeUser(UserName, History, ConectedUser),
     recMessage(Message, History, UpdatedHistory),
     user(UserName, UpdatedHistory, UpdatedConectedUser),
     makeSystem(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).

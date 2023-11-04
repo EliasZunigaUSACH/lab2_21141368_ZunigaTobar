@@ -5,3 +5,8 @@ Profesor Gonzalo Martinez
 
 -El código se encuentra en la carpeta "Código fuente"
 
+-Para ver las respuestas completas de Prolog, se recomienda ejecutar en colsuta el comando " set_prolog_flag(answer_write_options,[max_depth(0)]). "
+
+-En caso de que el programa muestre un mensaje tipo " Correct to: "tda_option_21141368_ZunigaTobar:option(1,\"1 - viajar\",2,4,[\"viajar\",\"turistear\",\"conocer\"],O1)"? " presione la tecla "Y" del teclado.
+
+-

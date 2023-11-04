@@ -19,8 +19,7 @@ sacarNumeroDeNombre([Head|_], Id):-
     atom_number(Head, Id),
     number(Id).
 
-getUserId(User, Id):-
-    makeUser(Name, _, User),
+getUserId(Name, Id):-
     atom_chars(Name, UserList),
     sacarNumeroDeNombre(UserList, Id).
 
