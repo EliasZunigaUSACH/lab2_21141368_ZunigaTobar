@@ -116,3 +116,5 @@ systemTalkRec(System, _, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+
+

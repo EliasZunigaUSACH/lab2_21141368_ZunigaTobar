@@ -108,7 +108,7 @@ systemLogout(System, NewSystem):-
 systemTalkRec(System, Message, NewSystem):-
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    user(UserName, History, ConectedUser),
+    makeUser(UserName, History, ConectedUser),
     recMessage(Message, History, UpdatedHistory),
     user(UserName, UpdatedHistory, UpdatedConectedUser),
     makeSystem(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
