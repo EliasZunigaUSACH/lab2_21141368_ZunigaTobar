@@ -117,4 +117,7 @@ systemTalkRec(System, _, NewSystem):-
     \+ isLogedUser(System, ConectedUser),
     makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
-
+myRandom(Xn, Xn1):-
+	mulTemp is 1103515245 * Xn,
+	sumTemp is mulTemp + 12345,
+	Xn1 is sumTemp mod 2147483648.
