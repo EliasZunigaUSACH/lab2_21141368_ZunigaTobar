@@ -7,21 +7,12 @@
 :- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, filtroOptionsDuplicados/3, agregarOption/3, flow/4, flowAddOption/3, makeFlow/4]).
 :- use_module(tda_option_21141368_ZunigaTobar).
 
-% Regla: makeFlow
-% Dominios: Id (Número) X NameMessage (String) X
-% Meta Principal: makeFlow
-% Meta Secundaria: Ninguna
-% Descripción: Predicado constructor que crea el flujo, pero no
-% tiene ningún filtro
-makeFlow(Id, NameMessage, OptionsFiltrados, [Id, NameMessage, OptionsFiltrados]).
-
 % Regla: getFlowId
 % Dominios: Flow X Id (Número)
 % Meta Principal: getFlowId
-% Meta Secundaria: makeFlow(Id, _, _, Flow)
+% Meta Secundaria: Ninguna
 % Descripción: Predicado selector que obtiene la id de un flujo
-getFlowId(Flow, Id):-
-    makeFlow(Id, _, _, Flow).
+getFlowId([Id|_], Id).
 
 % Regla: getFlowsIds
 % Dominios: Flows X IdsAcc (Lista) X IdsSalida (Lista)
@@ -37,40 +28,47 @@ getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
 % Regla: filtroOptionsDuplicados
 % Dominios: Flows X IdsAcc (Lista) X IdsSalida (Lista)
 % Meta Principal: filtroOptionsDuplicados
-% Meta Secundaria: getFlowId(FlowCabeza, Id)
-% Descripción: Predicado constructor que filtra las opciones duplicadas
-% para la construcción de un flujo
+% Meta Secundaria: getFlowId(FlowCabeza, Id),
+%                  getOptionsIds(OptiionsAcc, [], Ids), not(member(Id,
+%                  Ids))
+% Descripción: Predicado constructor que filtra las
+%              opciones duplicadas para la construcción de un flujo
 filtroOptionsDuplicados([], OptionsAcc, OptionsAcc):- !.
 filtroOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
     getOptionId(OptionAgregar, Id),
     getOptionsIds(OptionsAcc, [], Ids),
-    noPertenece(Id, Ids),
+%    noPertenece(Id, Ids),
+    not(member(Id, Ids)),
     filtroOptionsDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
 filtroOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
     getOptionId(OptionAgregar, Id),
     getOptionsIds(OptionsAcc, [], Ids),
-    pertenece(Id, Ids),
+%    pertenece(Id, Ids),
+    member(Id, Ids),
     filtroOptionsDuplicados(RestoOptions, OptionsAcc, OptionsSalida).
 
 % Regla: agregarOption
 % Dominios: NewOption X Options (Lista) X [NewOption|Options] (Lista)
 % Meta Principal: agregarOption
-% Meta Secundaria: getFlowId(FlowCabeza, Id)
+% Meta Secundaria: Ninguna
 % Descripción: Predicado constructor que crea una lista actualizada de
-% opciones
+%              opciones
 agregarOption(NewOption, Options, [NewOption|Options]).
 
 % Regla: flow
-% Dominios:
+% Dominios: Id (Numero) X NameMessage (String) X Options (Lista) X Flow
 % Meta Principal: flow
 % Meta Secundaria: filtroOptionsDuplicados(Options, [],
-% OptionsFiltrados), makeFlow(Id, NameMessage, optionsFiltrados, Flow)
+% OptionsFiltrados)
 % Descripción: Predicado constructor que crea
-flow(Id, NameMessage, Options, Flow):-
-    filtroOptionsDuplicados(Options, [], OptionsFiltrados),
-    makeFlow(Id, NameMessage, OptionsFiltrados, Flow).
+flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
+    filtroOptionsDuplicados(Options, [], OptionsFiltrados).
 
-flowAddOption(Flow, NewOption, NewFlow):-
-    makeFlow(Id, Message, Options, Flow),
-    agregarOption(NewOption, Options, NewOptions),
-    flow(Id, Message, NewOptions, NewFlow).
+% Regla: flowAddOption
+% Dominios: Flow X NewOption X NewFlow
+% Meta Principal: flowAddOption
+% Meta Secundaria: flow(Id, Message, [NewOption|Options], NewFlow)
+% Descripción: Predicado modificador que agrega una nueva opción al
+%              flujo seleccionado
+flowAddOption([Id, Message, Options], NewOption, NewFlow):-
+    flow(Id, Message, [NewOption|Options], NewFlow).

@@ -4,9 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA SYSTEM
 
-:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, agregarChatbotSinDuplicados/3, makeSystem/7, makeSystem/7, agregarChatbot/3, system/4, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
-:- use_module(tda_option_21141368_ZunigaTobar).
-:- use_module(tda_flow_21141368_ZunigaTobar).
+:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, filtroChatbotDuplicados/3, system/4, system/7, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
 :- use_module(tda_user_21141368_ZunigaTobar).
 :- use_module(tda_chatHistory_21141368_ZunigaTobar).
@@ -16,36 +14,31 @@ putDateTime(DateTime):-
     stamp_date_time(Time, Date, 'UTC'),
     format_time(atom(DateTime), "%T %d-%m-%y", Date).
 
-agregarChatbotSinDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
-agregarChatbotSinDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
+filtroChatbotDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
+filtroChatbotDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
     getChatbotId(ChatbotAgregar, Id),
     getChatbotsIds(ChatbotsAcc, [], Ids),
-    noPertenece(Id, Ids),
-    agregarChatbotSinDuplicados(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
-agregarChatbotSinDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
+    not(member(Id, Ids)),
+    filtroChatbotDuplicados(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
+filtroChatbotDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
     getChatbotId(ChatbotAgregar, Id),
     getChatbotsIds(ChatbotsAcc, [], Ids),
-    pertenece(Id, Ids),
-    agregarChatbotSinDuplicados(RestoChatbots, ChatbotsAcc, ChatbotsSalida).
+    member(Id, Ids),
+    filtroChatbotDuplicados(RestoChatbots, ChatbotsAcc, ChatbotsSalida).
 
-makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
-
-agregarChatbot(NewChatbot, Chatbots, [NewChatbot|Chatbots]).
-
-system(Name, InitialChatbotCodeLink, Chatbots, System):-
+system(Name, InitialChatbotCodeLink, Chatbots, [Name, Date, [], [], InitialChatbotCodeLink, ChatbotsFiltrados]):-
     putDateTime(Date),
-    agregarChatbotSinDuplicados(Chatbots, [], ChatbotsFiltrados),
-    makeSystem(Name, Date, [], [], InitialChatbotCodeLink, ChatbotsFiltrados, System).
+    filtroChatbotDuplicados(Chatbots, [], ChatbotsFiltrados).
+system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
 
 systemAddChatbot(System, NewChatbot, NewSystem):-
-    makeSystem(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
-    agregarChatbot(NewChatbot, Chatbots, UpgradedChatbots),
-    agregarChatbotSinDuplicados(UpgradedChatbots, [], ChatbotsFiltrados),
-    makeSystem(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsFiltrados, NewSystem).
+    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
+    filtroChatbotDuplicados([NewChatbot|Chatbots], [], ChatbotsFiltrados),
+    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsFiltrados, NewSystem).
 
 getSystemMembers([], Members, Members):- !.
 getSystemMembers([User|RestoMembers], MembersAcc, MembersOut):-
-    makeUser(UserName, _, User),
+    getUserName(User, UserName),
     getSystemMembers(RestoMembers, [UserName|MembersAcc], MembersOut).
 
 getMembersIds([], Ids, Ids):- !.
@@ -57,67 +50,73 @@ registerUser(UserName, Members, [User|Members]):-
     user(UserName, [], User).
 
 systemAddUser(System, User, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     string_lower(User, UserMin),
     getUserId(UserMin, Id),
     getSystemMembers(Members, [], MembersNames),
     getMembersIds(MembersNames, [], Ids),
-    noPertenece(Id, Ids),
-    registerUser(UserMin, Members, UpdatedMembers),
-    makeSystem(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    not(member(Id, Ids)),
+    registerUser(User, Members, UpdatedMembers),
+    system(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemAddUser(System, User, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     string_lower(User, UserMin),
     getUserId(UserMin, Id),
     getSystemMembers(Members, [], MembersNames),
     getMembersIds(MembersNames, [], Ids),
-    pertenece(Id, Ids),
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    member(Id, Ids),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
 isLogedUser(System, ConectedUser):-
-    makeSystem(_, _, _, ConectedUser, _, _, System),
+    system(_, _, _, ConectedUser, _, _, System),
     \+ length(ConectedUser, 0).
 
-systemLogin(System, UserName, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+getMembersUser(Name, [User|RestoUsers], UserOut):-
+    not(member(Name, User)),
+    getMembersUser(Name, RestoUsers, UserOut).
+getMembersUser(Name, [User|_], User):-
+    member(Name, User).
+
+systemLogin(System, User, NewSystem):-
+    string_lower(User, UserMin),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
     getSystemMembers(Members, [], MembersNames),
-    pertenece(UserName, MembersNames),
-    makeUser(UserName, _, User),
-    makeSystem(Name, Date, Members, User, InitialChatbotCodeLink, Chatbots, NewSystem).
+    member(UserMin, MembersNames),
+    getMembersUser(UserMin, Members, UserToConect),
+    system(Name, Date, Members, UserToConect, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemLogin(System, _, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemLogin(System, UserName, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
     getSystemMembers(Members, [], MembersNames),
-    noPertenece(UserName, MembersNames),
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    not(member(UserName, MembersNames)),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
 systemLogout(System, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    makeSystem(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
+    system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
 systemLogout(System, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
 systemTalkRec(System, Message, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
-    makeUser(UserName, History, ConectedUser),
+    getUserName(ConectedUser, UserName),
+    getUserHistory(ConectedUser, History),
     recMessage(Message, History, UpdatedHistory),
     user(UserName, UpdatedHistory, UpdatedConectedUser),
-    makeSystem(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    system(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 systemTalkRec(System, _, NewSystem):-
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     \+ isLogedUser(System, ConectedUser),
-    makeSystem(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
 myRandom(Xn, Xn1):-
-	mulTemp is 1103515245 * Xn,
-	sumTemp is mulTemp + 12345,
-	Xn1 is sumTemp mod 2147483648.
+	Xn1 is ((1103515245 * Xn) + 12345) mod 2147483648.

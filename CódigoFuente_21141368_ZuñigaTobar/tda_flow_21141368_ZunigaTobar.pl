@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA FLOW
 
-:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, filtroOptionsDuplicados/3, agregarOption/3, flow/4, flowAddOption/3, makeFlow/4]).
+:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, filtroOptionsDuplicados/3, agregarOption/3, flow/4, flowAddOption/3]).
 :- use_module(tda_option_21141368_ZunigaTobar).
 
 % Regla: getFlowId
@@ -28,31 +28,35 @@ getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
 % Regla: filtroOptionsDuplicados
 % Dominios: Flows X IdsAcc (Lista) X IdsSalida (Lista)
 % Meta Principal: filtroOptionsDuplicados
-% Meta Secundaria: getFlowId(FlowCabeza, Id)
-% Descripción: Predicado constructor que filtra las opciones duplicadas
-% para la construcción de un flujo
+% Meta Secundaria: getFlowId(FlowCabeza, Id),
+%                  getOptionsIds(OptiionsAcc, [], Ids), not(member(Id,
+%                  Ids))
+% Descripción: Predicado constructor que filtra las
+%              opciones duplicadas para la construcción de un flujo
 filtroOptionsDuplicados([], OptionsAcc, OptionsAcc):- !.
 filtroOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
     getOptionId(OptionAgregar, Id),
     getOptionsIds(OptionsAcc, [], Ids),
-    noPertenece(Id, Ids),
+%    noPertenece(Id, Ids),
+    not(member(Id, Ids)),
     filtroOptionsDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
 filtroOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
     getOptionId(OptionAgregar, Id),
     getOptionsIds(OptionsAcc, [], Ids),
-    pertenece(Id, Ids),
+%    pertenece(Id, Ids),
+    member(Id, Ids),
     filtroOptionsDuplicados(RestoOptions, OptionsAcc, OptionsSalida).
 
 % Regla: agregarOption
 % Dominios: NewOption X Options (Lista) X [NewOption|Options] (Lista)
 % Meta Principal: agregarOption
-% Meta Secundaria: getFlowId(FlowCabeza, Id)
+% Meta Secundaria: Ninguna
 % Descripción: Predicado constructor que crea una lista actualizada de
-% opciones
+%              opciones
 agregarOption(NewOption, Options, [NewOption|Options]).
 
 % Regla: flow
-% Dominios:
+% Dominios: Id (Numero) X NameMessage (String) X Options (Lista) X Flow
 % Meta Principal: flow
 % Meta Secundaria: filtroOptionsDuplicados(Options, [],
 % OptionsFiltrados)
@@ -60,5 +64,11 @@ agregarOption(NewOption, Options, [NewOption|Options]).
 flow(Id, NameMessage, Options, [Id, NameMessage, OptionsFiltrados]):-
     filtroOptionsDuplicados(Options, [], OptionsFiltrados).
 
+% Regla: flowAddOption
+% Dominios: Flow X NewOption X NewFlow
+% Meta Principal: flowAddOption
+% Meta Secundaria: flow(Id, Message, [NewOption|Options], NewFlow)
+% Descripción: Predicado modificador que agrega una nueva opción al
+%              flujo seleccionado
 flowAddOption([Id, Message, Options], NewOption, NewFlow):-
     flow(Id, Message, [NewOption|Options], NewFlow).

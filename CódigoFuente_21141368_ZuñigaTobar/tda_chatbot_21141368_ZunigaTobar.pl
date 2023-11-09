@@ -4,39 +4,32 @@
 % Profesor Gonzalo Matrinez
 % TDA CHATBOT
 
-:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlowsSinDuplicados/3, chatbot/6, chatbotAddFlow/3, agregarFlow/3, makeChatbot/6]).
-:- use_module(tda_option_21141368_ZunigaTobar).
+:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, filtroFlowsDuplicados/3, chatbot/6, chatbotAddFlow/3]).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
-makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, [Id, Name, WelcomeMsg, StartFlowID, Flows]).
-
-getChatbotId(Chatbot, Id):-
-    makeChatbot(Id, _, _, _, _, Chatbot).
+getChatbotId([Id|_], Id).
 
 getChatbotsIds([], IdsAcc, IdsAcc):- !.
 getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
     getChatbotId(ChatbotHead, Id),
     getChatbotsIds(RestoChatbots, [Id|IdsAcc], IdsSalida).
 
-agregarFlowsSinDuplicados([], FlowsAcc, FlowsAcc):- !.
-agregarFlowsSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+filtroFlowsDuplicados([], FlowsAcc, FlowsAcc):- !.
+filtroFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     getFlowId(FlowAgregar, Id),
     getFlowsIds(FlowsAcc, [], Ids),
-    noPertenece(Id, Ids),
-    agregarFlowsSinDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
-agregarFlowsSinDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+%    noPertenece(Id, Ids),
+    not(member(Id, Ids)),
+    filtroFlowsDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
+filtroFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     getFlowId(FlowAgregar, Id),
     getFlowsIds(FlowsAcc, [], Ids),
-    pertenece(Id, Ids),
-    agregarFlowsSinDuplicados(RestoFlows, FlowsAcc, FlowsSalida).
+%    pertenece(Id, Ids),
+    member(Id, Ids),
+    filtroFlowsDuplicados(RestoFlows, FlowsAcc, FlowsSalida).
 
-agregarFlow(NewFlow, Flows, [NewFlow|Flows]).
+chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows,[Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados]):-
+   filtroFlowsDuplicados(Flows, [], FlowsFiltrados).
 
-chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot):-
-    agregarFlowsSinDuplicados(Flows, [], FlowsFiltrados),
-    makeChatbot(Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados, Chatbot).
-
-chatbotAddFlow(Chatbot, NewFlow, NewChatbot):-
-    makeChatbot(Id, Name, WelcomeMsg, StartFlowID, Flows, Chatbot),
-    agregarFlow(NewFlow, Flows, NewFlows),
-    chatbot(Id, Name, WelcomeMsg, StartFlowID, NewFlows, NewChatbot).
+chatbotAddFlow([Id, Name, WelcomeMsg, StartFlowID, Flows], NewFlow, NewChatbot):-
+    chatbot(Id, Name, WelcomeMsg, StartFlowID, [NewFlow|Flows], NewChatbot).
