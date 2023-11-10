@@ -9,8 +9,20 @@
 recMessage(NewMessage, History, UpdatedHistory):-
     append(History, [NewMessage], UpdatedHistory).
 
+% Regla: isHistoryNull
+% Dominios: History (Lista)
+% Meta Principal: isHistoryNull
+% Meta Secundaria: length(History, 0)
+% Descripción: Predicado de pertenencia que verifica si el historial de
+%              un usuario está vacío
 isHistoryNull(History):-
     length(History, 0).
 
+% Regla: isHistoryNotNull
+% Dominios: History (Lista)
+% Meta Principal: isHistoryNotNull
+% Meta Secundaria: not(length(History, 0))
+% Descripción: Predicado de pertenencia que verifica si el historial de
+%              un usuario no está vacío
 isHistoryNotNull(History):-
-    \+ length(History, 0).
+    not(length(History, 0)).

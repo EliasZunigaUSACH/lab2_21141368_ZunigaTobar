@@ -5,15 +5,7 @@
 % TDA OPTION
 
 :- module(tda_option_21141368_ZunigaTobar, [getOptionId/2, getOptionsIds/3, option/6]).
-/*
-pertenece(Elemento, [Elemento|_]).
 
-pertenece(Elemento, [_|Resto]):-
-    pertenece(Elemento, Resto).
-
-noPertenece(Elemento, Lista):-
-    \+ pertenece(Elemento, Lista).
-*/
 % Regla: getOptionId
 % Dominios: Option (Lista) X id (Número)
 % Meta Principal: getOptionId

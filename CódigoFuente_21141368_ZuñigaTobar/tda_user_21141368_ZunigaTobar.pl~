@@ -6,7 +6,7 @@
 
 :- module(tda_user_21141368_ZunigaTobar, [user/3, sacarNumeroDeNombre/2, getUserId/2, getUserName/2, getUserHistory/2]).
 
-user(Nombre, History, [NombreMin|History]):-
+user(Nombre, History, [NombreMin|[History]]):-
     string_lower(Nombre, NombreMin).
 
 sacarNumeroDeNombre([Head|Resto], Id):-

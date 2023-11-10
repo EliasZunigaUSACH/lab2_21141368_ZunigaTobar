@@ -4,32 +4,53 @@
 % Profesor Gonzalo Matrinez
 % TDA CHATBOT
 
-:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, filtroFlowsDuplicados/3, chatbot/6, chatbotAddFlow/3]).
+:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlows/3, chatbot/6, chatbotAddFlow/3]).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
+% Regla: getChathotId
+% Dominios: Chatbot (Lista) X Id (Número)
+% Meta Principal: getChatbotId
+% Meta Secundaria: Ninguna
+% Descripción: Predicado selector que obtiene la id de un chatbot
 getChatbotId([Id|_], Id).
 
+% Regla: getChathotsIds
+% Dominios: Chatbots (Lista) X IdsAcc (Lista) X IdsSalida (Lista)
+% Meta Principal: getChatbotsIds
+% Meta Secundaria: getChatbotId(ChatbotHead, Id)
+% Descripción: Predicado selector que obtiene la ids de un grupo
+%              de chatbots
 getChatbotsIds([], IdsAcc, IdsAcc):- !.
 getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
     getChatbotId(ChatbotHead, Id),
     getChatbotsIds(RestoChatbots, [Id|IdsAcc], IdsSalida).
 
-filtroFlowsDuplicados([], FlowsAcc, FlowsAcc):- !.
-filtroFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+% Regla: agregarFlows
+% Dominios: Flows (Lista) X FlowsAcc (Lista) X FlowsSalida(Lista)
+% Meta Principal: agregarFlows
+% Meta Secundaria: getFlowId(FlowAgregar, Id), getFlowsIds(FlowsAcc, [],
+%                  Ids), not(member(Id, Ids))
+% Descripción: Predicado agrega los chatbots no repetidos
+agregarFlows([], FlowsAcc, FlowsAcc):- !.
+agregarFlows([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     getFlowId(FlowAgregar, Id),
     getFlowsIds(FlowsAcc, [], Ids),
-%    noPertenece(Id, Ids),
     not(member(Id, Ids)),
-    filtroFlowsDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
-filtroFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
-    getFlowId(FlowAgregar, Id),
-    getFlowsIds(FlowsAcc, [], Ids),
-%    pertenece(Id, Ids),
-    member(Id, Ids),
-    filtroFlowsDuplicados(RestoFlows, FlowsAcc, FlowsSalida).
+    agregarFlows(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
 
+% Regla: chatbot
+% Dominios: Id (Número) X Name (String) X WelcomeMsg (String) X
+%           StartFlowID (Número) X Flows (Lista) X System
+% Meta Principal: chatbot
+% Meta Secundaria: agregarFlows(Flows, [], FlowsFiltrados)
+% Descripción: Predicado constructor de un chatbot.
 chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows,[Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados]):-
-   filtroFlowsDuplicados(Flows, [], FlowsFiltrados).
+   agregarFlows(Flows, [], FlowsFiltrados).
 
+% Regla: chatbotAddFlow
+% Dominios: Chatbot X Flow X Chatbot
+% Meta Principal: chatbotAddFlow
+% Meta Secundaria: chatbot(Id, Name, WelcomeMsg, StartFlowID, [NewFlow|Flows], NewChatbot)
+% Descripción: Predicado modificador para añadir flujos a un chatbot.
 chatbotAddFlow([Id, Name, WelcomeMsg, StartFlowID, Flows], NewFlow, NewChatbot):-
     chatbot(Id, Name, WelcomeMsg, StartFlowID, [NewFlow|Flows], NewChatbot).

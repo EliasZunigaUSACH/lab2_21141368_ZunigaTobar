@@ -4,51 +4,100 @@
 % Profesor Gonzalo Matrinez
 % TDA SYSTEM
 
-:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, filtroChatbotDuplicados/3, system/4, system/7, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
+:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, agregarChatbots/3, system/4, system/7, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
 :- use_module(tda_user_21141368_ZunigaTobar).
 :- use_module(tda_chatHistory_21141368_ZunigaTobar).
 
+% Regla: putDateTime
+% Dominios: DateTime
+% Meta Principal: putDateTime
+% Meta Secundaria: get_time(Time),  stamp_date_time(Time, Date, 'UTC'), format_time(atom(DateTime), "%T %d-%m-%y", Date)
+% Descripción: Predicado que retorna la fecha y hora
 putDateTime(DateTime):-
     get_time(Time),
     stamp_date_time(Time, Date, 'UTC'),
     format_time(atom(DateTime), "%T %d-%m-%y", Date).
 
-filtroChatbotDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
-filtroChatbotDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
+% Regla: agregarcChatbots
+% Dominios: Chatbots (Lista) X ChatbotsAcc (Lista) X ChatbotsSalida
+%           (Lista)
+% Meta Principal: agregarcChatbots
+% Meta Secundaria: getChatbotId(ChatbotAgregar, Id),
+%                  getChatbotsIds(ChatbotsAcc, [], Ids), not(member(Id,
+%                  Ids))
+% Descripción: Predicado que retorna los chatbots no duplicados
+agregarChatbots([], ChatbotsAcc, ChatbotsAcc):- !.
+agregarChatbots([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
     getChatbotId(ChatbotAgregar, Id),
     getChatbotsIds(ChatbotsAcc, [], Ids),
     not(member(Id, Ids)),
-    filtroChatbotDuplicados(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
-filtroChatbotDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
-    getChatbotId(ChatbotAgregar, Id),
-    getChatbotsIds(ChatbotsAcc, [], Ids),
-    member(Id, Ids),
-    filtroChatbotDuplicados(RestoChatbots, ChatbotsAcc, ChatbotsSalida).
+    agregarChatbots(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
 
+% Regla: system
+% Dominios: Name (string) X InitialChatbotCodeLink (Int) X chatbots
+%           (Lista) X system
+% Meta Principal: system
+% Meta Secundaria: putDateTime(Date), agregarChatbots(Chatbots,
+%                  [], ChatbotsFiltrados)
+% Descripción: Predicado constructor de un sistema de chatbots. Deja registro de la fecha de creación.
 system(Name, InitialChatbotCodeLink, Chatbots, [Name, Date, [], [], InitialChatbotCodeLink, ChatbotsFiltrados]):-
     putDateTime(Date),
-    filtroChatbotDuplicados(Chatbots, [], ChatbotsFiltrados).
+    agregarChatbots(Chatbots, [], ChatbotsFiltrados).
 system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
 
+% Regla: systemAddChatbot
+% Dominios: System X Chatbot X NewSystem
+% Meta Principal: systemAddChatbot
+% Meta Secundaria: system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  agregarChatbots([NewChatbot|Chatbots], [], ChatbotsToAdd),
+%                  system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsToAdd, NewSystem).
+% Descripción: Predicado modificador para añadir chatbots a un sistema.
 systemAddChatbot(System, NewChatbot, NewSystem):-
     system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
-    filtroChatbotDuplicados([NewChatbot|Chatbots], [], ChatbotsFiltrados),
-    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsFiltrados, NewSystem).
+    agregarChatbots([NewChatbot|Chatbots], [], ChatbotsToAdd),
+    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsToAdd, NewSystem).
 
+% Regla: getSystemMembers
+% Dominios: Members (Lista) X MembersAcc (Lista) X MembersOut (Lista)
+% Meta Principal: getSystemMembers
+% Meta Secundaria: getUserName(User, UserName)
+% Descripción: Predicado que obtiene los usuarios registrados
 getSystemMembers([], Members, Members):- !.
 getSystemMembers([User|RestoMembers], MembersAcc, MembersOut):-
     getUserName(User, UserName),
     getSystemMembers(RestoMembers, [UserName|MembersAcc], MembersOut).
 
+% Regla: getMembersIds
+% Dominios: Members (Lista) X IdsAcc (Lista) X IdsOut (Lista)
+% Meta Principal: getMembersIds
+% Meta Secundaria: getUserId(User, Id)
+% Descripción: Predicado que obtiene las Ids de los usuarios registrados
 getMembersIds([], Ids, Ids):- !.
 getMembersIds([User|Members], Ids, IdsOut):-
     getUserId(User, Id),
     getMembersIds(Members, [Id|Ids], IdsOut).
 
+% Regla: registerUser
+% Dominios: UserName (String) X Members (Lista) X [User|Members] (Lista)
+% Meta Principal: registerUser
+% Meta Secundaria: user(UserName, [], User)
+% Descripción: Predicado que registra un usuario al sistema
 registerUser(UserName, Members, [User|Members]):-
     user(UserName, [], User).
 
+% Regla: systemAddUser
+% Dominios: System X User (String) X System
+% Meta Principal: systemAddUser
+% Meta Secundaria: system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  string_lower(User, UserMin),
+%                  getUserId(UserMin, Id),
+%                  getSystemMembers(Members, [], MembersNames),
+%                  getMembersIds(MembersNames, [], Ids),
+%                  not(member(Id, Ids)),
+%                  registerUser(User, Members, UpdatedMembers),
+%                  system(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem)
+% Descripción: Predicado modificador para añadir usuarios a un sistema.
 systemAddUser(System, User, NewSystem):-
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     string_lower(User, UserMin),
@@ -58,52 +107,59 @@ systemAddUser(System, User, NewSystem):-
     not(member(Id, Ids)),
     registerUser(User, Members, UpdatedMembers),
     system(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
-systemAddUser(System, User, NewSystem):-
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    string_lower(User, UserMin),
-    getUserId(UserMin, Id),
-    getSystemMembers(Members, [], MembersNames),
-    getMembersIds(MembersNames, [], Ids),
-    member(Id, Ids),
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
+% Regla: isLogedUser
+% Dominios: System X ConectedUser (Lista)
+% Meta Principal: isLogedUser
+% Meta Secundaria: system(_, _, _, ConectedUser, _, _, System), not(length(ConectedUser, 0))
+% Descripción: Predicado que verifica si un usuario ha iniciado sesión
 isLogedUser(System, ConectedUser):-
     system(_, _, _, ConectedUser, _, _, System),
-    \+ length(ConectedUser, 0).
+    not(length(ConectedUser, 0)).
 
+% Regla: getMembersUser
+% Dominios: Name (String) X Users (Lista) X UserOut (String)
+% Meta Principal: getMembersUser
+% Meta Secundaria: not(member(Name, User)), member(Name, User).
+% Descripción: Predicado selector que retorna un usuario
 getMembersUser(Name, [User|RestoUsers], UserOut):-
     not(member(Name, User)),
     getMembersUser(Name, RestoUsers, UserOut).
 getMembersUser(Name, [User|_], User):-
     member(Name, User).
 
+% Regla: systemLogin
+% Dominios: System X User (String) X System
+% Meta Principal: systemLogin
+% Meta Secundaria: string_lower(User, UserMin),
+%                  system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  not(isLogedUser(System, ConectedUser)),
+%                  getSystemMembers(Members, [], MembersNames),
+%                  member(UserMin, MembersNames),
+%                  getMembersUser(UserMin, Members, UserToConect),
+%                  system(Name, Date, Members, UserToConect, InitialChatbotCodeLink, Chatbots, NewSystem).
+% Descripción: Predicado que permite iniciar una sesión en el sistema.
 systemLogin(System, User, NewSystem):-
     string_lower(User, UserMin),
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ isLogedUser(System, ConectedUser),
+    not(isLogedUser(System, ConectedUser)),
     getSystemMembers(Members, [], MembersNames),
     member(UserMin, MembersNames),
     getMembersUser(UserMin, Members, UserToConect),
     system(Name, Date, Members, UserToConect, InitialChatbotCodeLink, Chatbots, NewSystem).
-systemLogin(System, _, NewSystem):-
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    isLogedUser(System, ConectedUser),
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
-systemLogin(System, UserName, NewSystem):-
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ isLogedUser(System, ConectedUser),
-    getSystemMembers(Members, [], MembersNames),
-    not(member(UserName, MembersNames)),
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
+% Regla: systemLogout
+% Dominios: System X System
+% Meta Principal: systemLogout
+% Meta Secundaria: system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  isLogedUser(System, ConectedUser),
+%                  system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
+% Descripción: Predicado que permite cerrar una sesión abierta.
 systemLogout(System, NewSystem):-
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
     system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
-systemLogout(System, NewSystem):-
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ isLogedUser(System, ConectedUser),
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+
 
 systemTalkRec(System, Message, NewSystem):-
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
@@ -113,10 +169,11 @@ systemTalkRec(System, Message, NewSystem):-
     recMessage(Message, History, UpdatedHistory),
     user(UserName, UpdatedHistory, UpdatedConectedUser),
     system(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
-systemTalkRec(System, _, NewSystem):-
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
-    \+ isLogedUser(System, ConectedUser),
-    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
+% Regla: myRandom
+% Dominios: Xn (Número) X Xn1 (Número)
+% Meta Principal: myRandom
+% Meta Secundaria: Xn1 is ((1103515245 * Xn) + 12345) mod 2147483648
+% Descripción: Predicado para generar números pseudoaleatorios
 myRandom(Xn, Xn1):-
 	Xn1 is ((1103515245 * Xn) + 12345) mod 2147483648.
