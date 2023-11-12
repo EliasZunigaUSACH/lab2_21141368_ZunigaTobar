@@ -160,7 +160,6 @@ systemLogout(System, NewSystem):-
     isLogedUser(System, ConectedUser),
     system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
 
-
 systemTalkRec(System, Message, NewSystem):-
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
@@ -170,6 +169,16 @@ systemTalkRec(System, Message, NewSystem):-
     user(UserName, UpdatedHistory, UpdatedConectedUser),
     system(Name, Date, Members, UpdatedConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
 
+systemSynthesis(System, User, Str):-
+    string_lower(User, UserMin),
+    system(_, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    not(isLogedUser(System, ConectedUser)),
+    getSystemMembers(Members, [], MembersNames),
+    member(UserMin, MembersNames),
+    getMembersUser(UserMin, Members, UserData),
+    getUserHistory(UserData, [String|_]),
+    .
+
 % Regla: myRandom
 % Dominios: Xn (Número) X Xn1 (Número)
 % Meta Principal: myRandom
@@ -177,3 +186,11 @@ systemTalkRec(System, Message, NewSystem):-
 % Descripción: Predicado para generar números pseudoaleatorios
 myRandom(Xn, Xn1):-
 	Xn1 is ((1103515245 * Xn) + 12345) mod 2147483648.
+
+systemSimulate(System, 0, _, System).
+systemSimulate(System, MaxIteractions, Seed, NewSystem):-
+    LowInteractions is MaxIteractions - 1,
+    string_concat("user", Seed, User),
+    systemAddUser(),
+
+    systemSimulate(System, LowInteractions, Seed, NewSystem).

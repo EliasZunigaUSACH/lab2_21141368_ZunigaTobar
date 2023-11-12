@@ -19,7 +19,7 @@ getOptionId(Option, Id):-
 % Meta Principal: getOptionsIds
 % Meta Secundaria: getOptionId(OptionHead, Id)
 % Descripción: Predicado selector que obtiene las ids de una lista de
-% opciones
+%              opciones
 getOptionsIds([], IdsAcc, IdsAcc):- !.
 getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
     getOptionId(OptionHead, Id),
@@ -31,6 +31,9 @@ getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
 % Meta Principal: Option
 % Meta Secundaria: Ninguna
 % Descripción: Predicado constructor de una opción para flujo de un
-% chatbot. Cada opción se enlaza a un chatbot y flujo especificados por
-% sus respectivos códigos.
+%              chatbot. Cada opción se enlaza a un chatbot y flujo
+%              especificados por sus respectivos códigos.
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
+
+getOptionKeywords(Option, Keywords):-
+    option(_, _, _, _, Keywords, Option).

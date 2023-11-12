@@ -5,15 +5,7 @@
 % TDA OPTION
 
 :- module(tda_option_21141368_ZunigaTobar, [getOptionId/2, getOptionsIds/3, option/6]).
-/*
-pertenece(Elemento, [Elemento|_]).
 
-pertenece(Elemento, [_|Resto]):-
-    pertenece(Elemento, Resto).
-
-noPertenece(Elemento, Lista):-
-    \+ pertenece(Elemento, Lista).
-*/
 % Regla: getOptionId
 % Dominios: Option (Lista) X id (Número)
 % Meta Principal: getOptionId
@@ -42,3 +34,6 @@ getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
 % chatbot. Cada opción se enlaza a un chatbot y flujo especificados por
 % sus respectivos códigos.
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
+
+getOptionKeywords(Option, Keywords):-
+    option(_, _, _, _, Keywords, Option).
