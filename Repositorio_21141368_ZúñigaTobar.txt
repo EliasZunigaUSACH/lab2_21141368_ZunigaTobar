@@ -3,5 +3,5 @@ Laboratorio 2 Paradigmas de programación
 Elías Zúñiga Tobar 21.141.368-9
 Profesor Gonzalo Martinez
 
-Link Github: 
+Link Github: https://github.com/EliasZunigaUSACH/lab2_21141368_ZunigaTobar
 Usuario: EliasZunigaUSACH
