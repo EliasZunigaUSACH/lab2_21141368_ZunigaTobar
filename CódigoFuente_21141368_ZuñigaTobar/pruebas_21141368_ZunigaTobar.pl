@@ -4,19 +4,20 @@
 % Profesor Gonzalo Matrinez
 % SCRIPT DE PRUEBAS
 
-%:- use_module(tda_system_21141368_ZunigaTobar).
-%:- use_module(tda_option_21141368_ZunigaTobar).
-%:- use_module(tda_flow_21141368_ZunigaTobar).
-%:- use_module(tda_chatbot_21141368_ZunigaTobar).
-%:- use_module(tda_user_21141368_ZunigaTobar).
-:- consult('tda_system_21141368_ZunigaTobar.pl').
-
+%CHATBOT0
 option(1, "1) Viajar", 2, 1, ["viajar", "turistear", "conocer"], OP1),
 option(2, "2) Estudiar", 2, 1, ["estudiar", "aprender", "perfeccionarme"], OP2),
 flow(1, "flujo1", [OP1], F10),
 flowAddOption(F10, OP2, F11),
-% flowAddOption(F10, OP1, F12), %si esto se descomenta, debe dar false, porque es opción con id duplicada.
-chatbot(0, "Inicial", "Bienvenido\n¿Qué te gustaría hacer?", 1, [F11], CB0), %solo añade una ocurrencia de F11
+% NUEVAS OPCIONES PARA CHATBOT0
+option(3, "3) Comprar", 3, 1, ["comprar", "venta", "negocios"], OP19),
+option(4, "4) Cocinar", 4, 1, ["cocinar", "comida"], OP20),
+option(5, "5) Leer", 5, 1, ["leer", "lectura"], OP21),
+flowAddOption(F11, OP19, F12),
+flowAddOption(F12, OP20, F13),
+flowAddOption(F13, OP21, F14),
+% flowAddOption(F10, OP1, F12), %si esto se descomenta, debe dar false, porque es opción con id duplicada
+chatbot(0, "Inicial", "Bienvenido\n¿Qué te gustaría hacer?", 1, [F14], CB0), %solo añade una ocurrencia de F11
 %CHATBOT1
 option(1, "1) New York, USA", 1, 2, ["USA", "Estados Unidos", "New York"], OP3),
 option(2, "2) París, Francia", 1, 1, ["Paris", "Eiffel"], OP4),
@@ -43,7 +44,7 @@ option(3, "3) Volver", 0, 1, ["Volver", "Salir", "Regresar"], OP18),
 flow(1, "Flujo 1 Chatbot2\n¿Qué te gustaría estudiar?", [OP16, OP17, OP18], F30),
 chatbot(2, "Orientador Académico",  "Bienvenido\n¿Qué te gustaría estudiar?", 1, [F30], CB2),
 system("Chatbots Paradigmas", 0, [CB0], S0),
-% systemAddChatbot(S0, CB0, S1), %si esto se descomenta, debe dar false, porque es chatbot id duplicado.
+% systemAddChatbot(S0, CB0, S1), %si esto se descomenta, debe dar false, porque es chatbot id duplicado
 systemAddChatbot(S0, CB1, S01),
 systemAddChatbot(S01, CB2, S02),
 systemAddUser(S02, "user1", S2),
@@ -54,14 +55,5 @@ systemAddUser(S3, "user3", S5),
 systemLogin(S5, "user1", S7),
 % systemLogin(S7, "user2", S8), %si esto se descomenta, debe dar false, ya hay usuario con login
 systemLogout(S7, S9),
-systemLogin(S9, "user2", S10),
-systemTalkRec(S10, "hola", S11),
-systemTalkRec(S11, "1", S12),
-systemTalkRec(S12, "1", S13),
-systemTalkRec(S13, "Museo", S14),
-systemTalkRec(S14, "1", S15),
-systemTalkRec(S15, "3", S16),
-systemTalkRec(S16, "5", S17),
-systemSynthesis(S17, "user2", Str1),
-systemSimulate(S02, 5, 32131, S99).
+systemLogin(S9, "user2", S10).
 

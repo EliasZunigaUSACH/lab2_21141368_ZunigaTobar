@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA FLOW
 
-:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, agregarOptions/3, flow/4, flowAddOption/3]).
+:- module(tda_flow_21141368_ZunigaTobar, [getFlowId/2, getFlowsIds/3, detectorOptionsDuplicados/3, flow/4, flowAddOption/3]).
 :- use_module(tda_option_21141368_ZunigaTobar).
 
 % Regla: getFlowId
@@ -33,21 +33,21 @@ getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
 %                  Ids))
 % Descripción: Predicado constructor que detecta las
 %              opciones duplicadas para la construcción de un flujo
-agregarOptions([], OptionsAcc, OptionsAcc):- !.
-agregarOptions([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
+detectorOptionsDuplicados([], OptionsAcc, OptionsAcc):- !.
+detectorOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
     getOptionId(OptionAgregar, Id),
     getOptionsIds(OptionsAcc, [], Ids),
     not(member(Id, Ids)),
-    agregarOptions(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
+    detectorOptionsDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
 
 % Regla: flow
 % Dominios: Id (Numero) X NameMessage (String) X Options (Lista) X Flow
 % Meta Principal: flow
 % Meta Secundaria: filtroOptionsDuplicados(Options, [],
 % OptionsFiltrados)
-% Descripción: Predicado constructor que crea
+% Descripción: Predicado constructor de un flujo de un chatbot
 flow(Id, NameMessage, Options, [Id, NameMessage, OptionsSalida]):-
-    agregarOptions(Options, [], OptionsSalida).
+    detectorOptionsDuplicados(Options, [], OptionsSalida).
 
 % Regla: flowAddOption
 % Dominios: Flow X NewOption X NewFlow

@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA SYSTEM
 
-:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, agregarChatbots/3, system/4, system/7, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
+:- module(tda_system_21141368_ZunigaTobar, [putDateTime/1, detectorChatbotsDuplicados/3, system/4, system/7, systemAddChatbot/3, getMembersIds/3, registerUser/3, systemAddUser/3, isLogedUser/2, systemLogin/3, systemLogout/2]).
 :- use_module(tda_chatbot_21141368_ZunigaTobar).
 :- use_module(tda_user_21141368_ZunigaTobar).
 :- use_module(tda_chatHistory_21141368_ZunigaTobar).
@@ -19,31 +19,31 @@ putDateTime(DateTime):-
     stamp_date_time(Time, Date, 'UTC'),
     format_time(atom(DateTime), "%T %d-%m-%y", Date).
 
-% Regla: agregarcChatbots
+% Regla: detectorChatbotsDuplicados
 % Dominios: Chatbots (Lista) X ChatbotsAcc (Lista) X ChatbotsSalida
 %           (Lista)
-% Meta Principal: agregarcChatbots
+% Meta Principal: detectorChatbotsDuplicados
 % Meta Secundaria: getChatbotId(ChatbotAgregar, Id),
 %                  getChatbotsIds(ChatbotsAcc, [], Ids), not(member(Id,
 %                  Ids))
 % Descripción: Predicado que retorna los chatbots no duplicados
-agregarChatbots([], ChatbotsAcc, ChatbotsAcc):- !.
-agregarChatbots([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
+detectorChatbotsDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
+detectorChatbotsDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
     getChatbotId(ChatbotAgregar, Id),
     getChatbotsIds(ChatbotsAcc, [], Ids),
     not(member(Id, Ids)),
-    agregarChatbots(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
+    detectorChatbotsDuplicados(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
 
 % Regla: system
 % Dominios: Name (string) X InitialChatbotCodeLink (Int) X chatbots
 %           (Lista) X system
 % Meta Principal: system
-% Meta Secundaria: putDateTime(Date), agregarChatbots(Chatbots,
+% Meta Secundaria: putDateTime(Date), detectorChatbotsDuplicados(Chatbots,
 %                  [], ChatbotsFiltrados)
 % Descripción: Predicado constructor de un sistema de chatbots. Deja registro de la fecha de creación.
 system(Name, InitialChatbotCodeLink, Chatbots, [Name, Date, [], [], InitialChatbotCodeLink, ChatbotsFiltrados]):-
     putDateTime(Date),
-    agregarChatbots(Chatbots, [], ChatbotsFiltrados).
+    detectorChatbotsDuplicados(Chatbots, [], ChatbotsFiltrados).
 system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
 
 % Regla: systemAddChatbot
@@ -160,6 +160,7 @@ systemLogout(System, NewSystem):-
     isLogedUser(System, ConectedUser),
     system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
 
+/*
 systemTalkRec(System, Message, NewSystem):-
     system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
     isLogedUser(System, ConectedUser),
@@ -190,8 +191,8 @@ myRandom(Xn, Xn1):-
 systemSimulate(System, 0, _, System).
 systemSimulate(System, MaxIteractions, Seed, NewSystem):-
     LowInteractions is MaxIteractions - 1,
-    append
+    string_concat("user", Seed, User),
     systemAddUser(),
 
-
     systemSimulate(System, LowInteractions, Seed, NewSystem).
+*/

@@ -34,6 +34,3 @@ getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
 %              chatbot. Cada opción se enlaza a un chatbot y flujo
 %              especificados por sus respectivos códigos.
 option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]).
-
-getOptionKeywords(Option, Keywords):-
-    option(_, _, _, _, Keywords, Option).

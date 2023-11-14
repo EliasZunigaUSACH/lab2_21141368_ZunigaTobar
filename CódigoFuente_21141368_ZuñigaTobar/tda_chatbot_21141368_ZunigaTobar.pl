@@ -4,7 +4,7 @@
 % Profesor Gonzalo Matrinez
 % TDA CHATBOT
 
-:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, agregarFlows/3, chatbot/6, chatbotAddFlow/3]).
+:- module(tda_chatbot_21141368_ZunigaTobar, [getChatbotId/2, getChatbotsIds/3, detectorFlowsDuplicados/3, chatbot/6, chatbotAddFlow/3]).
 :- use_module(tda_flow_21141368_ZunigaTobar).
 
 % Regla: getChathotId
@@ -25,27 +25,27 @@ getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
     getChatbotId(ChatbotHead, Id),
     getChatbotsIds(RestoChatbots, [Id|IdsAcc], IdsSalida).
 
-% Regla: agregarFlows
+% Regla: filtroFlows
 % Dominios: Flows (Lista) X FlowsAcc (Lista) X FlowsSalida(Lista)
 % Meta Principal: agregarFlows
 % Meta Secundaria: getFlowId(FlowAgregar, Id), getFlowsIds(FlowsAcc, [],
 %                  Ids), not(member(Id, Ids))
 % Descripción: Predicado agrega los chatbots no repetidos
-agregarFlows([], FlowsAcc, FlowsAcc):- !.
-agregarFlows([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+detectorFlowsDuplicados([], FlowsAcc, FlowsAcc):- !.
+detectorFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
     getFlowId(FlowAgregar, Id),
     getFlowsIds(FlowsAcc, [], Ids),
     not(member(Id, Ids)),
-    agregarFlows(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
+    detectorFlowsDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
 
 % Regla: chatbot
 % Dominios: Id (Número) X Name (String) X WelcomeMsg (String) X
 %           StartFlowID (Número) X Flows (Lista) X System
 % Meta Principal: chatbot
-% Meta Secundaria: agregarFlows(Flows, [], FlowsFiltrados)
+% Meta Secundaria: detectorFlowsDuplicados(Flows, [], FlowsFiltrados)
 % Descripción: Predicado constructor de un chatbot.
 chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows,[Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados]):-
-   agregarFlows(Flows, [], FlowsFiltrados).
+   detectorFlowsDuplicados(Flows, [], FlowsFiltrados).
 
 % Regla: chatbotAddFlow
 % Dominios: Chatbot X Flow X Chatbot
