@@ -1,0 +1,349 @@
+% Regla: getOptionId
+% Dominios: Option (Lista) X id (Número)
+% Meta Principal: getOptionId
+% Meta Secundaria: option(Id, _, _, _, _, Option)
+% Descripción: Predicado selector que obtiene la id de una opción
+getOptionId(Option, Id):-
+    option(Id, _, _, _, _, Option).
+
+% Regla: getOptionsIds
+% Dominios: Options (Lista) X IdAcc (Lista) X IdsSalida (Lista)
+% Meta Principal: getOptionsIds
+% Meta Secundaria: getOptionId(OptionHead, Id)
+% Descripción: Predicado selector que obtiene las ids de una lista de
+%              opciones
+getOptionsIds([], IdsAcc, IdsAcc):- !.
+getOptionsIds([OptionHead|OptionsTail], IdsAcc, IdsSalida):-
+    getOptionId(OptionHead, Id),
+    getOptionsIds(OptionsTail, [Id|IdsAcc], IdsSalida).
+
+% Regla: Option
+% Dominios: Code (Número) X Message (String) X Codelink (Número) X
+% InitialFlowCode (Número) X Keywords (Lista) X Option
+% Meta Principal: Option
+% Meta Secundaria: Ninguna
+% Descripción: Predicado constructor de una opción para flujo de un
+%              chatbot. Cada opción se enlaza a un chatbot y flujo
+%              especificados por sus respectivos códigos.
+option(Code, Message, Codelink, InitialFlowCode, Keywords, [Code, Message, Codelink, InitialFlowCode, Keywords]),
+
+% Regla: getFlowId
+% Dominios: Flow X Id (Número)
+% Meta Principal: getFlowId
+% Meta Secundaria: Ninguna
+% Descripción: Predicado selector que obtiene la id de un flujo
+getFlowId([Id|_], Id).
+
+% Regla: getFlowsIds
+% Dominios: Flows X IdsAcc (Lista) X IdsSalida (Lista)
+% Meta Principal: getFlowsIds
+% Meta Secundaria: getFlowId(FlowCabeza, Id)
+% Descripción: Predicado selector que obtiene las ids de un grupo de
+% flujos
+getFlowsIds([], IdsAcc, IdsAcc):- !.
+getFlowsIds([FlowCabeza|FlowsCola], IdsAcc, IdsSalida):-
+    getFlowId(FlowCabeza, Id),
+    getFlowsIds(FlowsCola, [Id|IdsAcc], IdsSalida).
+
+% Regla: detectorOptionsDuplicados
+% Dominios: Flows X IdsAcc (Lista) X IdsSalida (Lista)
+% Meta Principal: filtroOptionsDuplicados
+% Meta Secundaria: getFlowId(FlowCabeza, Id),
+%                  getOptionsIds(OptiionsAcc, [], Ids), not(member(Id,
+%                  Ids))
+% Descripción: Predicado constructor que detecta las
+%              opciones duplicadas para la construcción de un flujo
+detectorOptionsDuplicados([], OptionsAcc, OptionsAcc):- !.
+detectorOptionsDuplicados([OptionAgregar|RestoOptions], OptionsAcc, OptionsSalida):-
+    getOptionId(OptionAgregar, Id),
+    getOptionsIds(OptionsAcc, [], Ids),
+    not(member(Id, Ids)),
+    detectorOptionsDuplicados(RestoOptions, [OptionAgregar|OptionsAcc], OptionsSalida).
+
+% Regla: flow
+% Dominios: Id (Numero) X NameMessage (String) X Options (Lista) X Flow
+% Meta Principal: flow
+% Meta Secundaria: detectorOptionsDuplicados(Options, [],
+%                  OptionsFiltrados)
+% Descripción: Predicado constructor de un flujo de un chatbot
+flow(Id, NameMessage, Options, [Id, NameMessage, OptionsSalida]):-
+    detectorOptionsDuplicados(Options, [], OptionsSalida).
+
+% Regla: flowAddOption
+% Dominios: Flow X NewOption X NewFlow
+% Meta Principal: flowAddOption
+% Meta Secundaria: flow(Id, Message, [NewOption|Options], NewFlow)
+% Descripción: Predicado modificador que agrega una nueva opción al
+%              flujo seleccionado
+flowAddOption([Id, Message, Options], NewOption, NewFlow):-
+    flow(Id, Message, [NewOption|Options], NewFlow).
+
+% Regla: getChathotId
+% Dominios: Chatbot (Lista) X Id (Número)
+% Meta Principal: getChatbotId
+% Meta Secundaria: Ninguna
+% Descripción: Predicado selector que obtiene la id de un chatbot
+getChatbotId([Id|_], Id).
+
+% Regla: getChathotsIds
+% Dominios: Chatbots (Lista) X IdsAcc (Lista) X IdsSalida (Lista)
+% Meta Principal: getChatbotsIds
+% Meta Secundaria: getChatbotId(ChatbotHead, Id)
+% Descripción: Predicado selector que obtiene la ids de un grupo
+%              de chatbots
+getChatbotsIds([], IdsAcc, IdsAcc):- !.
+getChatbotsIds([ChatbotHead|RestoChatbots], IdsAcc, IdsSalida):-
+    getChatbotId(ChatbotHead, Id),
+    getChatbotsIds(RestoChatbots, [Id|IdsAcc], IdsSalida).
+
+% Regla: filtroFlows
+% Dominios: Flows (Lista) X FlowsAcc (Lista) X FlowsSalida(Lista)
+% Meta Principal: agregarFlows
+% Meta Secundaria: getFlowId(FlowAgregar, Id), getFlowsIds(FlowsAcc, [],
+%                  Ids), not(member(Id, Ids))
+% Descripción: Predicado agrega los chatbots no repetidos
+detectorFlowsDuplicados([], FlowsAcc, FlowsAcc):- !.
+detectorFlowsDuplicados([FlowAgregar|RestoFlows], FlowsAcc, FlowsSalida):-
+    getFlowId(FlowAgregar, Id),
+    getFlowsIds(FlowsAcc, [], Ids),
+    not(member(Id, Ids)),
+    detectorFlowsDuplicados(RestoFlows, [FlowAgregar|FlowsAcc], FlowsSalida).
+
+% Regla: chatbot
+% Dominios: Id (Número) X Name (String) X WelcomeMsg (String) X
+%           StartFlowID (Número) X Flows (Lista) X System
+% Meta Principal: chatbot
+% Meta Secundaria: detectorFlowsDuplicados(Flows, [], FlowsFiltrados)
+% Descripción: Predicado constructor de un chatbot.
+chatbot(Id, Name, WelcomeMsg, StartFlowID, Flows,[Id, Name, WelcomeMsg, StartFlowID, FlowsFiltrados]):-
+   detectorFlowsDuplicados(Flows, [], FlowsFiltrados).
+
+% Regla: chatbotAddFlow
+% Dominios: Chatbot X Flow X Chatbot
+% Meta Principal: chatbotAddFlow
+% Meta Secundaria: chatbot(Id, Name, WelcomeMsg, StartFlowID, [NewFlow|Flows], NewChatbot)
+% Descripción: Predicado modificador para añadir flujos a un chatbot.
+chatbotAddFlow([Id, Name, WelcomeMsg, StartFlowID, Flows], NewFlow, NewChatbot):-
+    chatbot(Id, Name, WelcomeMsg, StartFlowID, [NewFlow|Flows], NewChatbot).
+
+% Regla: putDateTime
+% Dominios: DateTime
+% Meta Principal: putDateTime
+% Meta Secundaria: get_time(Time),  stamp_date_time(Time, Date, 'UTC'), format_time(atom(DateTime), "%T %d-%m-%y", Date)
+% Descripción: Predicado que retorna la fecha y hora
+putDateTime(DateTime):-
+    get_time(Time),
+    stamp_date_time(Time, Date, 'UTC'),
+    format_time(atom(DateTime), "%T %d-%m-%y", Date).
+
+% Regla: detectorChatbotsDuplicados
+% Dominios: Chatbots (Lista) X ChatbotsAcc (Lista) X ChatbotsSalida
+%           (Lista)
+% Meta Principal: detectorChatbotsDuplicados
+% Meta Secundaria: getChatbotId(ChatbotAgregar, Id),
+%                  getChatbotsIds(ChatbotsAcc, [], Ids), not(member(Id,
+%                  Ids))
+% Descripción: Predicado que retorna los chatbots no duplicados
+detectorChatbotsDuplicados([], ChatbotsAcc, ChatbotsAcc):- !.
+detectorChatbotsDuplicados([ChatbotAgregar|RestoChatbots], ChatbotsAcc, ChatbotsSalida):-
+    getChatbotId(ChatbotAgregar, Id),
+    getChatbotsIds(ChatbotsAcc, [], Ids),
+    not(member(Id, Ids)),
+    detectorChatbotsDuplicados(RestoChatbots, [ChatbotAgregar|ChatbotsAcc], ChatbotsSalida).
+
+% Regla: system
+% Dominios: Name (string) X InitialChatbotCodeLink (Int) X chatbots
+%           (Lista) X system
+% Meta Principal: system
+% Meta Secundaria: putDateTime(Date), detectorChatbotsDuplicados(Chatbots,
+%                  [], ChatbotsFiltrados)
+% Descripción: Predicado constructor de un sistema de chatbots. Deja registro de la fecha de creación.
+system(Name, InitialChatbotCodeLink, Chatbots, [Name, Date, [], [], InitialChatbotCodeLink, ChatbotsFiltrados]):-
+    putDateTime(Date),
+    detectorChatbotsDuplicados(Chatbots, [], ChatbotsFiltrados).
+system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, [Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots]).
+
+% Regla: systemAddChatbot
+% Dominios: System X Chatbot X NewSystem
+% Meta Principal: systemAddChatbot
+% Meta Secundaria: system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  detectorChatbotsDuplicados([NewChatbot|Chatbots], [], ChatbotsToAdd),
+%                  system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsToAdd, NewSystem).
+% Descripción: Predicado modificador para añadir chatbots a un sistema.
+systemAddChatbot(System, NewChatbot, NewSystem):-
+    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, Chatbots, System),
+     detectorChatbotsDuplicados([NewChatbot|Chatbots], [], ChatbotsToAdd),
+    system(Name, Date, Members, LogedUser, InitialChatbotCodeLink, ChatbotsToAdd, NewSystem).
+
+% Regla: getSystemMembers
+% Dominios: Members (Lista) X MembersAcc (Lista) X MembersOut (Lista)
+% Meta Principal: getSystemMembers
+% Meta Secundaria: getUserName(User, UserName)
+% Descripción: Predicado que obtiene los usuarios registrados
+getSystemMembers([], Members, Members):- !.
+getSystemMembers([User|RestoMembers], MembersAcc, MembersOut):-
+    getUserName(User, UserName),
+    getSystemMembers(RestoMembers, [UserName|MembersAcc], MembersOut).
+
+% Regla: getMembersIds
+% Dominios: Members (Lista) X IdsAcc (Lista) X IdsOut (Lista)
+% Meta Principal: getMembersIds
+% Meta Secundaria: getUserId(User, Id)
+% Descripción: Predicado que obtiene las Ids de los usuarios registrados
+getMembersIds([], Ids, Ids):- !.
+getMembersIds([User|Members], Ids, IdsOut):-
+    getUserId(User, Id),
+    getMembersIds(Members, [Id|Ids], IdsOut).
+
+% Regla: registerUser
+% Dominios: UserName (String) X Members (Lista) X [User|Members] (Lista)
+% Meta Principal: registerUser
+% Meta Secundaria: user(UserName, [], User)
+% Descripción: Predicado que registra un usuario al sistema
+registerUser(UserName, Members, [User|Members]):-
+    user(UserName, [], User).
+
+% Regla: systemAddUser
+% Dominios: System X User (String) X System
+% Meta Principal: systemAddUser
+% Meta Secundaria: system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  string_lower(User, UserMin),
+%                  getUserId(UserMin, Id),
+%                  getSystemMembers(Members, [], MembersNames),
+%                  getMembersIds(MembersNames, [], Ids),
+%                  not(member(Id, Ids)),
+%                  registerUser(User, Members, UpdatedMembers),
+%                  system(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem)
+% Descripción: Predicado modificador para añadir usuarios a un sistema.
+systemAddUser(System, User, NewSystem):-
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    string_lower(User, UserMin),
+    getUserId(UserMin, Id),
+    getSystemMembers(Members, [], MembersNames),
+    getMembersIds(MembersNames, [], Ids),
+    not(member(Id, Ids)),
+    registerUser(User, Members, UpdatedMembers),
+    system(Name, Date, UpdatedMembers, ConectedUser, InitialChatbotCodeLink, Chatbots, NewSystem).
+
+% Regla: isLogedUser
+% Dominios: System X ConectedUser (Lista)
+% Meta Principal: isLogedUser
+% Meta Secundaria: system(_, _, _, ConectedUser, _, _, System), not(length(ConectedUser, 0))
+% Descripción: Predicado que verifica si un usuario ha iniciado sesión
+isLogedUser(System, ConectedUser):-
+    system(_, _, _, ConectedUser, _, _, System),
+    not(length(ConectedUser, 0)).
+
+% Regla: getMembersUser
+% Dominios: Name (String) X Users (Lista) X UserOut (String)
+% Meta Principal: getMembersUser
+% Meta Secundaria: not(member(Name, User)), member(Name, User).
+% Descripción: Predicado selector que retorna un usuario
+getMembersUser(Name, [User|RestoUsers], UserOut):-
+    not(member(Name, User)),
+    getMembersUser(Name, RestoUsers, UserOut).
+getMembersUser(Name, [User|_], User):-
+    member(Name, User).
+
+% Regla: systemLogin
+% Dominios: System X User (String) X System
+% Meta Principal: systemLogin
+% Meta Secundaria: string_lower(User, UserMin),
+%                  system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  not(isLogedUser(System, ConectedUser)),
+%                  getSystemMembers(Members, [], MembersNames),
+%                  member(UserMin, MembersNames),
+%                  getMembersUser(UserMin, Members, UserToConect),
+%                  system(Name, Date, Members, UserToConect, InitialChatbotCodeLink, Chatbots, NewSystem).
+% Descripción: Predicado que permite iniciar una sesión en el sistema.
+systemLogin(System, User, NewSystem):-
+    string_lower(User, UserMin),
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    not(isLogedUser(System, ConectedUser)),
+    getSystemMembers(Members, [], MembersNames),
+    member(UserMin, MembersNames),
+    getMembersUser(UserMin, Members, UserToConect),
+    system(Name, Date, Members, UserToConect, InitialChatbotCodeLink, Chatbots, NewSystem).
+
+% Regla: systemLogout
+% Dominios: System X System
+% Meta Principal: systemLogout
+% Meta Secundaria: system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+%                  isLogedUser(System, ConectedUser),
+%                  system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
+% Descripción: Predicado que permite cerrar una sesión abierta.
+systemLogout(System, NewSystem):-
+    system(Name, Date, Members, ConectedUser, InitialChatbotCodeLink, Chatbots, System),
+    isLogedUser(System, ConectedUser),
+    system(Name, Date, Members, [], InitialChatbotCodeLink, Chatbots, NewSystem).
+
+% Regla: user
+% Dominios: Nombre (String) X History (Lista) X Lista
+% Meta Principal: user
+% Meta Secundaria: Ninguna
+% Descripción: Predicado constructor que crea un usuario
+user(Nombre, History, [NombreMin|[History]]):-
+    string_lower(Nombre, NombreMin).
+
+% Regla: sacarNumeroDeNombre
+% Dominios: Nombre (Lista) X Id (Número)
+% Meta Principal: sacarNumeroDeNombre
+% Meta Secundaria: not(atom_number(Head, Id)), atom_number(Head, Id), number(Id)
+% Descripción: Predicado selector que retorna la id de un usuario
+sacarNumeroDeNombre([Head|Resto], Id):-
+    not(atom_number(Head, Id)),
+    sacarNumeroDeNombre(Resto, Id).
+sacarNumeroDeNombre([Head|_], Id):-
+    atom_number(Head, Id),
+    number(Id).
+
+% Regla: getUserId
+% Dominios: Nombre (String) X Id (Número)
+% Meta Principal: getUserId
+% Meta Secundaria: atom_chars(Name, UserList), sacarNumeroDeNombre(UserList, Id)
+% Descripción: Predicado modificador que trasnforma el nombre en una
+%              lista de caracteres. Luego llama a sacarNumeroDeNombre
+getUserId(Name, Id):-
+    atom_chars(Name, UserList),
+    sacarNumeroDeNombre(UserList, Id).
+
+% Regla: getUserName
+% Dominios: User (Lista) X Name (String)
+% Meta Principal: getUserName
+% Meta Secundaria: Ninguna
+% Descripción: Predicado selector que retorna el nombre de un usuario
+getUserName([Name|_], Name).
+
+% Regla: getUserHistory
+% Dominios: User (Lista) X History (Lista)
+% Meta Principal: getUserHistory
+% Meta Secundaria: Ninguna
+% Descripción: Predicado selector que retorna el historial de un usuario
+getUserHistory([_|[History]], History).
+
+% Regla: recMessage
+% Dominios: NewMessage (String) X History (Lista) X UpdatedHistory
+%           (Lista)
+% Meta Principal: recMessage Meta Secundaria: append(History,
+%                 [NewMessage], UpdatedHistory)
+% Descripción: Predicado graba la interacción de un ususario
+recMessage(NewMessage, History, UpdatedHistory):-
+    append(History, [NewMessage], UpdatedHistory).
+
+% Regla: isHistoryNull
+% Dominios: History (Lista)
+% Meta Principal: isHistoryNull
+% Meta Secundaria: length(History, 0)
+% Descripción: Predicado de pertenencia que verifica si el historial de
+%              un usuario está vacío
+isHistoryNull(History):-
+    length(History, 0).
+
+% Regla: isHistoryNotNull
+% Dominios: History (Lista)
+% Meta Principal: isHistoryNotNull
+% Meta Secundaria: not(length(History, 0))
+% Descripción: Predicado de pertenencia que verifica si el historial de
+%              un usuario no está vacío
+isHistoryNotNull(History):-
+    not(length(History, 0)).

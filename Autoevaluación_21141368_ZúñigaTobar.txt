@@ -14,7 +14,7 @@ Dom->Rec				1
 Organización				1
 Historial				1
 Script de pruebas			1
-Prerrequisitos				0.75 No se definieron las funciones: system-talk-rec, system-synthesis, system-simulate
+Prerrequisitos				0.75 No se definieron los predicados: systemTalkRec, systemSynthesis, systemSimulate
 
 Requerimientos Funcionales:		Puntaje:
 
@@ -29,6 +29,6 @@ system-add-chatbot			1
 system-add-user				1
 system-login				1
 system-logout				1
-system-talk-rec				0 No se definió la función
-system-synthesis			0 No se definió la función
-system-simulate				0 No se definió la función
+system-talk-rec				0 No se definió el predicado
+system-synthesis			0 No se definió el predicado
+system-simulate				0 No se definió el predicado
